@@ -28,7 +28,7 @@ void turnAllTo(int powerLevel) {
   }
 }
 
-void resetTimer(int currentTime) {
+void resetTimer(unsigned long currentTime) {
   previousTime = currentTime;
   led = 2;
   turnAllTo(LOW);
