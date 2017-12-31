@@ -5,12 +5,14 @@
 
 int LEDPin = 6;
 int incomingByte; // for incoming serial data
-int switchState = 0;
-int previousSwitchState = 0;
+int switchState = LOW;
+int previousSwitchState = LOW;
 
 void setup() {
   pinMode(LEDPin, OUTPUT);
   pinMode(2, INPUT);
+
+  // Start with LED turned off
   digitalWrite(LEDPin, LOW);
 
   Serial.begin(9600);
@@ -20,12 +22,9 @@ void loop() {
   // Read button press
   switchState = digitalRead(2);
 
-  if (switchState == HIGH && switchState != previousSwitchState) {
-    // If the switchState is pressed and it didn't used to be, send message to server
-    Serial.write(1);
-    previousSwitchState = switchState;
-  } else if (switchState == LOW && switchState != previousSwitchState) {
-    Serial.write(0);
+  // Check previousSwitchState so we aren't constantly writing back and forth without a button change
+  if (switchState != previousSwitchState) {
+    Serial.write(switchState);
     previousSwitchState = switchState;
   }
 
@@ -33,11 +32,6 @@ void loop() {
   if (Serial.available() > 0) {
     // read the incoming byte:
     incomingByte = Serial.read();
-
-    if (incomingByte == 1) {
-      digitalWrite(6, HIGH);
-    } else {
-      digitalWrite(6, LOW);
-    }
+    digitalWrite(6, incomingByte);
   }
 }
