@@ -1,7 +1,12 @@
-// Setup: 
-//  initialize Serial port
-//  Set pin 6 to output
-// Loop: Listen for message.  When we get the message, turn on LED on pin 6
+/*
+Setup: 
+  Initialize I/O pins
+  Initialize Serial port
+
+Loop: 
+  Check for button press change and send to server with Serial
+  Check for incoming message and turn LED on/off accordingly
+*/
 
 int LEDPin = 6;
 int incomingByte; // for incoming serial data
