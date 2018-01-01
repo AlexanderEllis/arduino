@@ -10,12 +10,13 @@ Loop:
 
 int LEDPin = 6;
 int incomingByte; // for incoming serial data
+int switchPin = 2;
 int switchState = LOW;
 int previousSwitchState = LOW;
 
 void setup() {
   pinMode(LEDPin, OUTPUT);
-  pinMode(2, INPUT);
+  pinMode(switchPin, INPUT);
 
   // Start with LED turned off
   digitalWrite(LEDPin, LOW);
@@ -25,7 +26,7 @@ void setup() {
 
 void loop() {
   // Read button press
-  switchState = digitalRead(2);
+  switchState = digitalRead(switchPin);
 
   // Check previousSwitchState so we aren't constantly writing back and forth without a button change
   if (switchState != previousSwitchState) {
@@ -37,6 +38,6 @@ void loop() {
   if (Serial.available() > 0) {
     // read the incoming byte:
     incomingByte = Serial.read();
-    digitalWrite(6, incomingByte);
+    digitalWrite(LEDPin, incomingByte);
   }
 }
