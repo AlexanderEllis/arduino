@@ -72,7 +72,7 @@ int prevSwitchState = 0;
 int switchState;
 char sentence[60];
 int sentenceLength = 0;
-char currentMorse[5];
+char currentMorse[6];
 int currentMorseLength = 0;
 unsigned long currentTime;
 unsigned long inputStartTime = 0;
@@ -133,8 +133,8 @@ void loop() {
   } else if (switchState == LOW && prevSwitchState == HIGH) {
     inputEndTime = currentTime;
     int inputInterval = inputEndTime - inputStartTime;
-    // Noticed some 1ms inputs.  Seems like a good minimum would be 40ms.
-    if (inputInterval <= 40) {
+    // Noticed some 1ms inputs.  Manual testing found a good minimum would be 50ms.
+    if (inputInterval <= 50) {
       return;
     }
     char morseInput = dotOrDash(inputInterval);
@@ -176,15 +176,19 @@ void loop() {
 }
 
 char morseParser(char inputString[]) {
-  for (int i = 0; i < 35; i++) {
+  Serial.print("Parsing: \'");
+  Serial.print(inputString);
+  Serial.println("\'");
+  for (int i = 0; i < 36; i++) {
     if (strcmp(inputString, morseInputs[i]) == 0) {
-      if (i < 25) {
+      if (i < 26) {
         return 65 + i;
       } else {
-        return 23 + i;
+        return 22 + i;
       }
     }
   }
+  return 63;
 }
 
 char dotOrDash(unsigned long inputInterval) {
