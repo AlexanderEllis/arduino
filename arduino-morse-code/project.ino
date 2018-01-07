@@ -133,12 +133,14 @@ void loop() {
   } else if (switchState == LOW && prevSwitchState == HIGH) {
     inputEndTime = currentTime;
     int inputInterval = inputEndTime - inputStartTime;
-    // Noticed some 1ms inputs.  Manual testing found a good minimum would be 50ms.
-    if (inputInterval <= 50) {
+    // Noticed some very short inputs of ~1-60ms inputs
+    // I don't think I can press the button that fast!
+    // Manual testing found a good minimum would be 80ms.
+    if (inputInterval <= 80) {
       return;
     }
     char morseInput = dotOrDash(inputInterval);
-    Serial.println("Morse input is");
+    Serial.print("Morse input is: ");
     Serial.println(morseInput);
     currentMorse[currentMorseLength] = morseInput;
     currentMorseLength++;
@@ -147,9 +149,7 @@ void loop() {
     if (currentMorseLength != 0 && timeSinceLastInput > 1000) {
       // We're between letters
       char inputLetter = morseParser(currentMorse);
-      Serial.println("currentMorse is:");
-      Serial.println(currentMorse);
-      Serial.println("Printing input letter");
+      Serial.print("Received input letter: ");
       Serial.println(inputLetter);
       sentence[sentenceLength] = inputLetter;
       sentenceLength++;
@@ -192,9 +192,7 @@ char morseParser(char inputString[]) {
 }
 
 char dotOrDash(unsigned long inputInterval) {
-  Serial.print("dotOrDash received: ");
-  Serial.println(inputInterval);
-  if (inputInterval < 500) {
+  if (inputInterval < 300) {
     return '.';
   } else {
     return '-';
