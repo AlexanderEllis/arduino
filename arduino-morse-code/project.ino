@@ -1,9 +1,9 @@
 /*
   This is a morse code reader.
   
-  It assumes that letters will have at least a second pause in between and words will have at least a 2 second pause.  It assumes a dash will be longer than 1 second.
+  It assumes that letters will have at least a second pause in between and words will have at least a 3 second pause.  It assumes a dash will be longer than 300 ms.
 
-  If it receives a pause longer than 4 seconds, it will send the message to the serial port.
+  If it receives a pause longer than 5 seconds, it will send the message to the serial port.
   Future: Print to screen?
 
   Requirements:
@@ -11,17 +11,10 @@
     You can send a dash to the arduio by holding down the button for at least a second.
     You can signal that you're in between words by pausing for two seconds.
       LED would be handy here
-    You can signal that you've finished the word by pausing for four seconds.
+    You can signal that you've finished the word by pausing for five seconds.
     For now, you can send up to 60 char
 
   Psuedocode:
-
-  prevSwitchState = 0;
-  switchState = 0;
-  inputStartTime = 0;
-  inputEndTime = 0;
-  sentence = array of chars
-  currentMorse = array of dots/dashes
 
   setup():
     Initialize serial port
@@ -40,11 +33,11 @@
         If currentMorse isn't empty and time is longer than 1 seconds (for now), we're in between letters.
           create char from currentMorse and add to sentence
           Reset currentMorse
-        If sentence isn't empty and time is longer than 3 seconds, we're in between words
-          Add space to sentence
         If sentence isn't empty and time is longer than 5 seconds, we're done with this sentence.
           Add period to sentence.
           Reset sentence.
+        If sentence isn't empty and time is longer than 3 seconds, we're in between words
+          Add space to sentence
   
   dotOrDash(inputInterval):
     If inputInterval < 1 second,
@@ -53,18 +46,11 @@
       return dash
   
   morseParser(morseString):
-    switch(morseString):
-      case '.':
-        return "e"
-        break;
-      case '-':
-        return "t";
-        break
-      etcetera
+    return match in morseCode array
 
   Edge cases:
-    morse code longer than 5
-    sentence longer than 60 char
+    morse code longer than 5: return '?'
+    TODO: sentence longer than 60 char
 */
 
 int switchPin = 2;
@@ -153,6 +139,7 @@ void loop() {
       Serial.println(inputLetter);
       sentence[sentenceLength] = inputLetter;
       sentenceLength++;
+      // Reset currentMorse array
       memset(currentMorse, 0, sizeof(currentMorse));
       currentMorseLength = 0;
       canAddSpace = true;
@@ -161,6 +148,7 @@ void loop() {
       sentence[sentenceLength] = '.';
       Serial.println("Printing sentence");
       Serial.println(sentence);
+      // Reset sentence array
       memset(sentence, 0, sizeof(sentence));
       sentenceLength = 0;
     } else if (sentenceLength != 0 && timeSinceLastInput > 3000 && canAddSpace == true) {
