@@ -78,48 +78,50 @@ unsigned long currentTime;
 unsigned long inputStartTime = 0;
 unsigned long inputEndTime = 0;
 unsigned long timeSinceLastInput = 0;
+boolean canAddSpace = true;
 
 char * morseInputs[] = {
-  ".-", // A
-  "-...", // B
-  "-.-.", // C
-  "-..", 
-  ".", 
-  "..-.", 
-  "--.",
-  "....",
-  "..",
-  ".---",
-  "-.-",
-  ".-..",
-  "--",
-  "-.",
-  "---",
-  ".--.",
-  "--.-",
-  ".-.",
-  "...", // S
-  "-",
-  "..-",
-  "..-.",
-  "-..-",
-  "-.--",
-  "--..", // Z
+  ".-",    // A
+  "-...",  // B
+  "-.-.",  // C
+  "-..",   // D
+  ".",     // E
+  "..-.",  // F
+  "--.",   // G
+  "....",  // H
+  "..",    // I
+  ".---",  // J
+  "-.-",   // K
+  ".-..",  // L
+  "--",    // M
+  "-.",    // N
+  "---",   // O
+  ".--.",  // P
+  "--.-",  // Q
+  ".-.",   // R
+  "...",   // S
+  "-",     // T
+  "..-",   // U
+  "...-",  // V
+  ".--",   // W
+  "-..-",  // X
+  "-.--",  // Y
+  "--..",  // Z
   "-----", // 0
   ".----", // 1
-  "..---",
-  "...--",
-  "....-",
-  ".....",
-  "-....",
-  "--...",
-  "---..",
+  "..---", // 2
+  "...--", // 3
+  "....-", // 4
+  ".....", // 5
+  "-....", // 6
+  "--...", // 7
+  "---..", // 8
   "----.", // 9
 };
 
 void setup() {
   pinMode(switchPin, INPUT);
-  Serial.initialize(9600);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -131,7 +133,13 @@ void loop() {
   } else if (switchState == LOW && prevSwitchState == HIGH) {
     inputEndTime = currentTime;
     int inputInterval = inputEndTime - inputStartTime;
+    // Noticed some 1ms inputs.  Seems like a good minimum would be 40ms.
+    if (inputInterval <= 40) {
+      return;
+    }
     char morseInput = dotOrDash(inputInterval);
+    Serial.println("Morse input is");
+    Serial.println(morseInput);
     currentMorse[currentMorseLength] = morseInput;
     currentMorseLength++;
   } else if (switchState == LOW && prevSwitchState == LOW) {
@@ -139,19 +147,28 @@ void loop() {
     if (currentMorseLength != 0 && timeSinceLastInput > 1000) {
       // We're between letters
       char inputLetter = morseParser(currentMorse);
+      Serial.println("currentMorse is:");
+      Serial.println(currentMorse);
+      Serial.println("Printing input letter");
+      Serial.println(inputLetter);
       sentence[sentenceLength] = inputLetter;
       sentenceLength++;
       memset(currentMorse, 0, sizeof(currentMorse));
-    } else if (sentenceLength != 0 && timeSinceLastInput > 3000) {
-      // We're in between words
-      sentence[sentenceLength] = ' ';
-      sentenceLength++;
+      currentMorseLength = 0;
+      canAddSpace = true;
     } else if (sentenceLength != 0 && timeSinceLastInput > 5000) {
       // We're in between sentences.
       sentence[sentenceLength] = '.';
+      Serial.println("Printing sentence");
       Serial.println(sentence);
       memset(sentence, 0, sizeof(sentence));
       sentenceLength = 0;
+    } else if (sentenceLength != 0 && timeSinceLastInput > 3000 && canAddSpace == true) {
+      // We're in between words
+      Serial.println("Adding space");
+      sentence[sentenceLength] = ' ';
+      sentenceLength++;
+      canAddSpace = false;
     }
   }
 
@@ -171,7 +188,9 @@ char morseParser(char inputString[]) {
 }
 
 char dotOrDash(unsigned long inputInterval) {
-  if (inputInterval < 1000) {
+  Serial.print("dotOrDash received: ");
+  Serial.println(inputInterval);
+  if (inputInterval < 500) {
     return '.';
   } else {
     return '-';
