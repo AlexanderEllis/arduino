@@ -1,5 +1,5 @@
 /*
-  This is an application to perform an action based on a number of locks.
+  This is an application to perform an action based on a number of knocks.
 
   The piezo is used to detect vibration.  Based on its input, a knock will register as
   either a loud knock or a soft knock.  The code is currently set to listen for 3 loud knocks,
