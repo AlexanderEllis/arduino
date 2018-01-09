@@ -1,3 +1,26 @@
+/*
+  This is an application to perform an action based on a number of locks.
+
+  The piezo is used to detect vibration.  Based on its input, a knock will register as
+  either a loud knock or a soft knock.  The code is currently set to listen for 3 loud knocks,
+  at which point it will rotate the Servo motor.  The switch can then be used to "relock" the servo.
+
+
+  setup():
+    Initialize input and output pins
+
+  loop():
+    Check if switch is pressed
+      If it is, "lock" servo
+    Otherwise, check for piezo input
+      If knock, update knocks remaining
+      If reached the total number of needed knocks, unlock piezo
+
+  checkForKnock(piezoInput):
+    If piezoInput is in our allowable knock range, it's a good knock
+    Otherwise it's a bad knock
+*/
+
 #include <Servo.h>
 Servo myServo;
 
