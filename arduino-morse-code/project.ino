@@ -4,7 +4,8 @@
   It assumes that letters will have at least a second pause in between and words will have at least a 3 second pause.  It assumes a dash will be longer than 300 ms.
 
   If it receives a pause longer than 5 seconds, it will send the message to the serial port.
-  Future: Print to screen?
+  It will also print to screen.
+    TODO: Scroll a longer sentence
 
   Requirements:
     You can send a dot to the arduino by holding down the button for less than one second.
@@ -53,6 +54,9 @@
     TODO: sentence longer than 60 char
 */
 
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(12, 11, 5, 4, 3, 6);
+
 int switchPin = 2;
 int prevSwitchState = 0;
 int switchState;
@@ -65,6 +69,7 @@ unsigned long inputStartTime = 0;
 unsigned long inputEndTime = 0;
 unsigned long timeSinceLastInput = 0;
 boolean canAddSpace = true;
+
 
 char * morseInputs[] = {
   ".-",    // A
@@ -107,6 +112,7 @@ char * morseInputs[] = {
 
 void setup() {
   pinMode(switchPin, INPUT);
+  lcd.begin(16, 6);
   Serial.begin(9600);
 }
 
@@ -148,6 +154,9 @@ void loop() {
       sentence[sentenceLength] = '.';
       Serial.println("Printing sentence");
       Serial.println(sentence);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(sentence);
       // Reset sentence array
       memset(sentence, 0, sizeof(sentence));
       sentenceLength = 0;
