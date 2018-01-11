@@ -1,3 +1,11 @@
+/*
+
+  This is a Magic 8-ball Arduino setup.
+
+  It uses a tilt switch to listen for motion change.  When the tilt switch changes position, a random
+  message is generated and printed to the LCD screen.
+  
+*/
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
